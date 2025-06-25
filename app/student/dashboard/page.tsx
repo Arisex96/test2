@@ -1,61 +1,67 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Calendar, BookOpen, TrendingUp, User, LogOut } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, BookOpen, TrendingUp, User, LogOut } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function StudentDashboard() {
-  const [user, setUser] = useState<any>(null)
-  const [courses, setCourses] = useState([])
+  const [user, setUser] = useState<any>(null);
+  const [courses, setCourses] = useState([]);
   const [attendanceStats, setAttendanceStats] = useState({
     totalClasses: 0,
     attendedClasses: 0,
     attendancePercentage: 0,
-  })
-  const router = useRouter()
+  });
+  const router = useRouter();
 
   useEffect(() => {
-    const userData = localStorage.getItem("user")
+    const userData = localStorage.getItem("user");
     if (userData) {
-      const parsedUser = JSON.parse(userData)
-      setUser(parsedUser)
-      fetchStudentData(parsedUser._id)
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      fetchStudentData(parsedUser._id);
     } else {
-      router.push("/auth/login")
+      router.push("/auth/login");
     }
-  }, [])
+  }, []);
 
   const fetchStudentData = async (studentId: string) => {
     try {
       const [coursesRes, statsRes] = await Promise.all([
         fetch(`/api/student/courses?studentId=${studentId}`),
         fetch(`/api/student/attendance-stats?studentId=${studentId}`),
-      ])
+      ]);
 
       if (coursesRes.ok) {
-        const coursesData = await coursesRes.json()
-        setCourses(coursesData)
+        const coursesData = await coursesRes.json();
+        setCourses(coursesData);
       }
 
       if (statsRes.ok) {
-        const statsData = await statsRes.json()
-        setAttendanceStats(statsData)
+        const statsData = await statsRes.json();
+        setAttendanceStats(statsData);
       }
     } catch (error) {
-      console.error("Error fetching student data:", error)
+      console.error("Error fetching student data:", error);
     }
-  }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem("user")
-    router.push("/")
-  }
+    localStorage.removeItem("user");
+    router.push("/");
+  };
 
-  if (!user) return <div>Loading...</div>
+  if (!user) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -67,11 +73,19 @@ export default function StudentDashboard() {
                 <User className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Student Dashboard</h1>
-                <p className="text-sm text-gray-500">Welcome back, {user.name}</p>
+                <h1 className="text-xl font-semibold text-gray-900">
+                  Student Dashboard
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Welcome back, {user.name}
+                </p>
               </div>
             </div>
-            <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
               <LogOut className="h-4 w-4" />
               Logout
             </Button>
@@ -83,33 +97,54 @@ export default function StudentDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Classes</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Total Classes
+              </CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{attendanceStats.totalClasses}</div>
+              <div className="text-2xl font-bold">
+                {attendanceStats.totalClasses}
+              </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Classes Attended</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Classes Attended
+              </CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{attendanceStats.attendedClasses}</div>
+              <div className="text-2xl font-bold">
+                {attendanceStats.attendedClasses}
+              </div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Attendance Rate</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                Attendance Rate
+              </CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{attendanceStats.attendancePercentage.toFixed(1)}%</div>
-              <Badge variant={attendanceStats.attendancePercentage >= 75 ? "default" : "destructive"} className="mt-2">
-                {attendanceStats.attendancePercentage >= 75 ? "Good" : "Below Required"}
+              <div className="text-2xl font-bold">
+                {attendanceStats.attendancePercentage.toFixed(1)}%
+              </div>
+              <Badge
+                variant={
+                  attendanceStats.attendancePercentage >= 75
+                    ? "default"
+                    : "destructive"
+                }
+                className="mt-2"
+              >
+                {attendanceStats.attendancePercentage >= 75
+                  ? "Good"
+                  : "Below Required"}
               </Badge>
             </CardContent>
           </Card>
@@ -125,21 +160,36 @@ export default function StudentDashboard() {
               <div className="space-y-4">
                 {courses.length > 0 ? (
                   courses.map((course: any) => (
-                    <div key={course._id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h3 className="font-medium">{course.name}</h3>
-                        <p className="text-sm text-gray-500">{course.code}</p>
-                        <p className="text-sm text-gray-500">Prof. {course.professor?.name}</p>
+                    <div
+                      key={course._id}
+                      className="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition-shadow"
+                    >
+                      <div className="flex-1">
+                        <h3 className="font-medium text-lg">{course.name}</h3>
+                        <p className="text-sm text-gray-500 mb-1">
+                          {course.code}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Prof. {course.professor?.name}
+                        </p>
                       </div>
-                      <Link href={`/student/attendance/${course._id}`}>
-                        <Button variant="outline" size="sm">
-                          View Attendance
-                        </Button>
-                      </Link>
+                      <div className="flex flex-col gap-2">
+                        <Link href={`/student/attendance/${course._id}`}>
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="w-full bg-green-600 hover:bg-green-700"
+                          >
+                            View Attendance
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-4">No courses enrolled</p>
+                  <p className="text-gray-500 text-center py-4">
+                    No courses enrolled
+                  </p>
                 )}
               </div>
             </CardContent>
@@ -176,5 +226,5 @@ export default function StudentDashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }
